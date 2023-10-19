@@ -1,0 +1,2832 @@
+{
+	"info": {
+		"_postman_id": "07b0ca2b-1ceb-48ef-86ee-326a074f0a3e",
+		"name": "Mars API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26343201"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response value check\r",
+									"pm.test(\"Check if registration is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.isSuccess).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is present\", function () {\r",
+									"    pm.response.to.have.header(\"Content-Type\");\r",
+									"\r",
+									"});\r",
+									"pm.test(\"Check if Server is correct\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Server\")).to.include(\"Kestrel\");\r",
+									"\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set username as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"username\", jsonBody.email);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set password as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"password\", jsonBody.password);\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"countryDialCode\": \"+64\",\r\n  \"email\": \"charqw@11x1313yz.com\",\r\n  \"firstName\": \"Charlie\",\r\n  \"lastName\": \"Glen\",\r\n  \"mobilePhone\": \"0226447405\",\r\n  \"password\": \"Password12\",\r\n  \"terms\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60968/authentication/authentication/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60968",
+							"path": [
+								"authentication",
+								"authentication",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signIn",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response value check\r",
+									"pm.test(\"Check if signin is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.isSuccess).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if response body has token and its expiry\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"token\", \"expires\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if token expiration value is valid\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.token.expires).to.be.a(\"number\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set token as environment variable\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.environment.set(\"token\", jsonData.token.token);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"{{username}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"rememberMe\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60968/authentication/authentication/signin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60968",
+							"path": [
+								"authentication",
+								"authentication",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register - existing email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response value check\r",
+									"pm.test(\"Check if email was already registered\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Register error - Email address has been used in registration.\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if registration is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.isSuccess).to.eql(false);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is present\", function () {\r",
+									"    pm.response.to.have.header(\"Content-Type\");\r",
+									"\r",
+									"});\r",
+									"pm.test(\"Check if Server is correct\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Server\")).to.include(\"Kestrel\");\r",
+									"\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"countryDialCode\": \"+64\",\r\n  \"email\": \"charlietest@xyz.com\",\r\n  \"firstName\": \"Charlie\",\r\n  \"lastName\": \"Glen\",\r\n  \"mobilePhone\": \"0226447405\",\r\n  \"password\": \"Password1\",\r\n  \"terms\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60968/authentication/authentication/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60968",
+							"path": [
+								"authentication",
+								"authentication",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updatePassword",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.get(\"password\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"newPassword\": \"Password2123\",\r\n  \"oldPassword\": \"{{password}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60968/authentication/authentication/updatePassword",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60968",
+							"path": [
+								"authentication",
+								"authentication",
+								"updatePassword"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Language",
+			"item": [
+				{
+					"name": "addLangauge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if add language is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if id value is not null\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).not.to.eql(null);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set Language id as environment variable\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.environment.set(\"languageId\", jsonData.id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set language name as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"languageName\", jsonBody.name);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set language level as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"languageLevel\", jsonBody.level);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"level\": \"Basic\",\r\n  \"name\": \"Ilonggo\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/addLanguage",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"addLanguage"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addLangauge - existing details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if adding existing language is unsuccessful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if unsuccessfull message is displayed\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"This language is already exist in your language list.\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"level\": \"{{languageLevel}}\",\r\n  \"name\": \"{{languageName}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/addLanguage",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"addLanguage"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateLanguage",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response value check\r",
+									"pm.test(\"Check if languange was updated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Language added successfully\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set language name as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"languageName\", jsonBody.name);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set language level as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"languageLevel\", jsonBody.level);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"{{languageId}}\",\r\n  \"level\": \"Expert\",\r\n  \"name\": \"Bisaya\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/updateLanguage",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"updateLanguage"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateLanguage - without changes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response value check\r",
+									"pm.test(\"Check if language update is succussful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message).to.eql(\"This language is already added to your language list.\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"{{languageId}}\",\r\n  \"level\": \"{{languageLevel}}\",\r\n  \"name\": \"{{languageName}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/updateLanguage",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"updateLanguage"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLangauge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if username match\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.expect(jsonBody.email).to.eql(pm.environment.get(\"username\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if Language Id, name and level match\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].personLanguageId).to.eql(pm.environment.get(\"languageId\"));\r",
+									"    pm.expect(jsonData[0].language).to.eql(pm.environment.get(\"languageName\"));\r",
+									"    pm.expect(jsonData[0].languageLevel).to.eql(pm.environment.get(\"languageLevel\"));\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"countryDialCode\": \"+64\",\r\n  \"email\": \"charqw@11x1313yz.com\",\r\n  \"firstName\": \"Charlie\",\r\n  \"lastName\": \"Glen\",\r\n  \"mobilePhone\": \"0226447405\",\r\n  \"password\": \"Password12\",\r\n  \"terms\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/getLanguage",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"getLanguage"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteLangauge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if delete language is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if the deleted language is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.language).to.eql(pm.environment.get(\"languageName\"));\r",
+									"});\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"{{languageId}}\"\r\n \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/deleteLanguage",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"deleteLanguage"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteLangauge - not existing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code 500 - Server error\", function () {\r",
+									"    pm.response.to.have.status(500);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if the response body is empty\", function () {\r",
+									"    pm.expect(pm.response.text()).to.not.be.undefined;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is not present\", function () {\r",
+									"    pm.response.to.not.have.header(\"Content-Type\");\r",
+									"\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  //\"id\": \"{{languageId}}\"\r\n  \"id\": \"651d3f4890f2f200010efb88\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/deleteLanguage",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"deleteLanguage"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Skill",
+			"item": [
+				{
+					"name": "addSkill",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if add skill is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if id value is not null\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).not.to.eql(null);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set skill id as environment variable\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.environment.set(\"skillId\", jsonData.id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set skill name as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"skillName\", jsonBody.Skill);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set skill level as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"skillLevel\", jsonBody.ExperienceLevel);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ExperienceLevel\": \"Intermediate\",\r\n  \"PersonSkillId\": 0,\r\n  \"Skill\": \"admin1111\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/addSkill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"addSkill"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addSkill - existing details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if adding existing language is unsuccessful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if unsuccessfull message is displayed\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"This skill is already exist in your skill list.\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ExperienceLevel\": \"Intermediate\",\r\n  \"PersonSkillId\": 0,\r\n  \"Skill\": \"admin1111\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/addSkill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"addSkill"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateSkill",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response value check\r",
+									"pm.test(\"Check if skill was updated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.id).to.eql(pm.environment.get(\"skillId\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set skill name as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"skillName\", jsonBody.Skill);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set skill level as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"skillLevel\", jsonBody.ExperienceLevel);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ExperienceLevel\": \"Intermediate\",\r\n  \"PersonSkillId\": \"{{skillId}}\",\r\n  \"Skill\": \"test2322\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/updateSkill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"updateSkill"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateSkill  - without changes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response value check\r",
+									"pm.test(\"Check if skill was updated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message).to.eql(\"This skill is already added to your skill list.\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ExperienceLevel\": \"Intermediate\",\r\n  \"PersonSkillId\": \"{{skillId}}\",\r\n  \"Skill\": \"test2322\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/updateSkill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"updateSkill"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSkill",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if username match\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.expect(jsonBody.Skill).to.eql(pm.environment.get(\"skillName\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if Language Id, name and level match\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].personSkillId).to.eql(pm.environment.get(\"skillId\"));\r",
+									"    pm.expect(jsonData[0].skill).to.eql(pm.environment.get(\"skillName\"));\r",
+									"    pm.expect(jsonData[0].experienceLevel).to.eql(pm.environment.get(\"skillLevel\"));\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ExperienceLevel\": \"{{skillLevel}}\",\r\n  \"PersonSkillId\": \"{{skillId}}\",\r\n  \"Skill\": \"{{skillName}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/getSkill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"getSkill"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteSkill",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if delete skill is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if the deleted skill is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.skill).to.eql(pm.environment.get(\"skillName\"));\r",
+									"});\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ExperienceLevel\": \"{{skillLevel}}\",\r\n  \"PersonSkillId\": \"{{skillId}}\",\r\n  \"Skill\": \"{{skillName}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/deleteSkill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"deleteSkill"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteSkill  - not existing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response value check\r",
+									"pm.test(\"Check if skill deleteting is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Error while deleting skill Object reference not set to an instance of an object.\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ExperienceLevel\": \"{{skillLevel}}\",\r\n  \"PersonSkillId\": \"{{skillId}}\",\r\n  \"Skill\": \"{{skillName}}\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/deleteSkill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"deleteSkill"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Education",
+			"item": [
+				{
+					"name": "addEducation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if add education is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if id value is not null\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).not.to.eql(null);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set education id as environment variable\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.environment.set(\"educationId\", jsonData.id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set education country as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"educationCountry\", jsonBody.country);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set education degree as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"educationDegree\", jsonBody.degree);\r",
+									"});\r",
+									"pm.test(\"Set education title as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"educationTitle\", jsonBody.title);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set institute name as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"instituteName\", jsonBody.instituteName);\r",
+									"});\r",
+									"pm.test(\"Set graduation year as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"educationYear\", jsonBody.yearOfGraduation);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"country\": \"Afghanistan\",\r\n  \"degree\": \"test\",\r\n  \"instituteName\": \"test2\",\r\n  \"title\": \"B.A\",\r\n  \"yearOfGraduation\": \"2023\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/addEducation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"addEducation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addEducation - existing education",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if add education is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message).to.eql(\"This information is already exist.\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"country\": \"{{educationCountry}}\",\r\n  \"degree\": \"{{educationDegree}}\",\r\n  \"instituteName\": \"{{instituteName}}\",\r\n  \"title\": \"{{educationTitle}}\",\r\n  \"yearOfGraduation\": \"{{educationYear}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/addEducation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"addEducation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateEducation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response value check\r",
+									"pm.test(\"Check if the update education is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Education Updated Successfully\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set education country as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"educationCountry\", jsonBody.country);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set education degree as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"educationDegree\", jsonBody.degree);\r",
+									"});\r",
+									"pm.test(\"Set education title as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"educationTitle\", jsonBody.title);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set institute name as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"instituteName\", jsonBody.instituteName);\r",
+									"});\r",
+									"pm.test(\"Set graduation year as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"educationYear\", jsonBody.yearOfGraduation);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"country\": \"Australia\",\r\n  \"degree\": \"BA\",\r\n  \"id\": \"{{educationId}}\",\r\n  \"instituteName\": \"reapptai2n\",\r\n  \"title\": \"BArch\",\r\n  \"yearOfGraduation\": 2023\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/updateEducation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"updateEducation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateEducation - without changes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response value check\r",
+									"pm.test(\"Check if unable to update education without any changes\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Error while adding new language Non-static method requires a target.\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"country\": \"Australia\",\r\n  \"degree\": \"BA\",\r\n  \"id\": \"{{educationId}}\",\r\n  \"instituteName\": \"reapptai2n\",\r\n  \"title\": \"BArch\",\r\n  \"yearOfGraduation\": 2023\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/updateSkill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"updateSkill"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getEducation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if add education is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if id value is not null\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).not.to.eql(null);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"{{educationId}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/getEducation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"getEducation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteEducation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if delete education is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Education Deleted Successfully\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"{{educationId}}\"\r\n  //\"id\": \"651fe68767b590000137343b\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/deleteEducation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"deleteEducation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteEducation - not existing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if delete education is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Education entry not found\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  //\"id\": \"{{educationId}}\"\r\n  \"id\": \"6523b04b728d6e0001e0cafa\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/deleteEducation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"deleteEducation"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Certification",
+			"item": [
+				{
+					"name": "addCertification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if add certification is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if id value is not null\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).not.to.eql(null);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set certification id as environment variable\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.environment.set(\"certificationId\", jsonData.id);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set certification origin as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"certificationFrom\", jsonBody.certificationFrom);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set certification year as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"certificationYear\", jsonBody.certificationYear);\r",
+									"});\r",
+									"pm.test(\"Set certification name as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"certificationName\", jsonBody.certificationName);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"certificationFrom\": \"test\",\r\n  \"certificationName\": \"test12\",\r\n  \"certificationYear\": \"2020\",\r\n  \"id\": \"64f48a582da53300019ebea5\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/addCertification",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"addCertification"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addCertification  - existing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if adding certification is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message).to.eql(\"This information is already exist.\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"certificationFrom\": \"{{certificationFrom}}\",\r\n  \"certificationName\": \"{{certificationName}}\",\r\n  \"certificationYear\": \"{{certificationYear}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/addCertification",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"addCertification"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateCertification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if add certification is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set certification origin as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"certificationFrom\", jsonBody.certificationFrom);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Set certification year as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"certificationYear\", jsonBody.certificationYear);\r",
+									"});\r",
+									"pm.test(\"Set certification name as environment variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.environment.set(\"certificationName\", jsonBody.certificationName);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"certificationFrom\": \"tes123123t\",\r\n  \"certificationName\": \"test12\",\r\n  \"certificationYear\": \"2020\",\r\n  \"id\": \"{{certificationId}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/updateCertification",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"updateCertification"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateCertification - without changes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if unable to update certification without any changes\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message).to.eql(\"This information is already exist.\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"certificationFrom\": \"tes123123t\",\r\n  \"certificationName\": \"test12\",\r\n  \"certificationYear\": \"2020\",\r\n  \"id\": \"{{certificationId}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/updateCertification",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"updateCertification"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCertification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if id match\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"    pm.expect(jsonBody.id).to.eql(pm.environment.get(\"certificationId\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if certification year, name and origin match\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].certificationName).to.eql(pm.environment.get(\"certificationName\"));\r",
+									"    pm.expect(jsonData[0].certificationFrom).to.eql(pm.environment.get(\"certificationFrom\"));\r",
+									"    pm.expect(jsonData[0].certificationYear.toString()).to.eql(pm.environment.get(\"certificationYear\"));\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"{{certificationId}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/getCertification",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"getCertification"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteCertification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if delete certification is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if the deleted certification name match\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.certificationName).to.eql(pm.environment.get(\"certificationName\"));\r",
+									"});\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{certificationId}}\"\r\n  //\"id\": \"65227786a5069f0001246493\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/deleteCertification",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"deleteCertification"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteCertification - not existing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - Status code check\r",
+									"pm.test(\"Check status code 500 - Server error\", function () {\r",
+									"    pm.response.to.have.status(500);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - Response Value check\r",
+									"pm.test(\"Check if the response body is empty\", function () {\r",
+									"    pm.expect(pm.response.text()).to.not.be.undefined;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is not present\", function () {\r",
+									"    pm.response.to.not.have.header(\"Content-Type\");\r",
+									"\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    //\"id\": \"{{certificationId}}\"\r\n  \"id\": \"6523b3f1728d6e0001e0cafd\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/deleteCertification",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"deleteCertification"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Listings",
+			"item": [
+				{
+					"name": "getService",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"countryDialCode\": \"\",\r\n  \"email\": \"\",\r\n  \"firstName\": \"\",\r\n  \"lastName\": \"\",\r\n  \"mobilePhone\": \"\",\r\n  \"password\": \"Password1\",\r\n  \"terms\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:51689/listing/listing/GetService/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "51689",
+							"path": [
+								"listing",
+								"listing",
+								"GetService",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profile",
+			"item": [
+				{
+					"name": "addInfo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - response value check\r",
+									"pm.test(\"Check if description was updated successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Description Updated Successfully\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"description\": \"test the description\",\r\n  \"personId\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/addInfo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"addInfo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "isAuthenticated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - response value check\r",
+									"pm.test(\"Your test name\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.isAuthenticated).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Your test name\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.environment.set(\"userFirstName\", jsonData.username);\r",
+									"});\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/isUserAuthenticated",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"isUserAuthenticated"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getProfilePhoto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - response velue check\r",
+									"pm.test(\"Check if getting profile photo is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/getProfilePhoto",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"getProfilePhoto"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSellerDetails",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/getSellerDetails",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"getSellerDetails"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateAvailability",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assetion 1 - status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - response value check\r",
+									"pm.test(\"Check if update is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Availability Updated Successfully\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"AvailabilityType\": \"3\",\r\n  \"AvailableHours\": \"5\",\r\n  \"EarnTarget\": \"1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/updateAvailability",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"updateAvailability"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateFirstAndLastName",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - response value check\r",
+									"\r",
+									"pm.test(\"Check if the update first name last name is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Firstname and Lastname Changed\");\r",
+									"});\r",
+									"pm.test(\"Set username as environmental variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"pm.environment.set(\"userFirstName\", jsonBody.firstName);\r",
+									"\r",
+									"});\r",
+									"pm.test(\"Set username as environmental variable\", function () {\r",
+									"    var jsonBody = JSON.parse(pm.request.body.raw);\r",
+									"pm.environment.set(\"userLastName\", jsonBody.lastName);\r",
+									"\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"CharlieNewNew\",\r\n  \"lastName\": \"GlenNewNew\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/updateFirstAndLastName",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"updateFirstAndLastName"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getProfile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - response velue check\r",
+									"pm.test(\"Check if current and expected user name match\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.username).to.eql(pm.environment.get(\"userFirstName\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if current user is not deactivated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.isDeactivated).to.eql(false);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:60190/profile/profile/getProfile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"profile",
+								"profile",
+								"getProfile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notification",
+			"item": [
+				{
+					"name": "getNewNotificationCount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion 1 - status code check\r",
+									"pm.test(\"Check status code\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Assertion 2 - response value check\r",
+									"\r",
+									"pm.test(\"Check if the get new notification is successful\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if the the number of messages and notification is not null\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.noOfNotification).to.not.eql(null);\r",
+									"    pm.expect(jsonData.noOfMessages).to.not.eql(null);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:60190/notification/notification/getNewNotificationCount",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"notification",
+								"notification",
+								"getNewNotificationCount"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getNotification",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:60190/notification/notification/getNotification",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "60190",
+							"path": [
+								"notification",
+								"notification",
+								"getNotification"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
